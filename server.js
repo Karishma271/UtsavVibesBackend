@@ -70,6 +70,11 @@ mongoose
   .then(() => console.log("MongoDB connected"))
   .catch((err) => console.error("MongoDB connection error:", err));
 
+// Welcome message route
+app.get("/", (req, res) => {
+  res.send("Hello, welcome to the UtsavVibes backend!");
+});
+
 // Import and use routes
 const authRoutes = require("./routes/auth");
 app.use("/api", authRoutes);
