@@ -1,16 +1,17 @@
+// Required Modules
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const path = require("path");
 const fs = require("fs");
 const multer = require("multer");
-
-
+require("dotenv").config(); // Load environment variables
 
 // Models
 const User = require("./models/User");
-const Venue = require('./models/Venue');
+const Venue = require("./models/Venue");
 
+// Event Models
 const weddingEvents = mongoose.model("weddingEvents", {
   brideName: String,
   groomName: String,
@@ -43,21 +44,26 @@ const Organizer = mongoose.model("Organizer", {
   website: String,
 });
 
-
 // Create Express app
 const app = express();
 
 // Middleware
+const corsOptions = {
+  origin: "https://utsavvibes.tech", // Allow frontend from Vercel domain
+  methods: "GET,POST,PUT,DELETE",
+  credentials: true, // Allow credentials
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
-app.use(cors());
-app.use("/images", express.static("public/images"));
+app.use("/images", express.static("public/images")); // Serve images
 
 // File upload setup
 const upload = multer({ dest: "public/" });
 
 // MongoDB Connection
 mongoose
-  .connect("mongodb+srv://admin:admin@cluster0.xy8yjbh.mongodb.net/shubh?retryWrites=true&w=majority", {
+  .connect(process.env.MONGODB_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
@@ -68,28 +74,18 @@ mongoose
 const authRoutes = require("./routes/auth");
 app.use("/api", authRoutes);
 
-app.get("/api/users", async (req, res) => {
-  try {
-    const users = await User.find({}, { username: 1, email: 1, phone: 1 }); // Fetch only required fields
-    res.status(200).json(users);
-  } catch (error) {
-    console.error("Error fetching users:", error);
-    res.status(500).json({ error: error.message || "Internal Server Error" });
-  }
-});
-
 // Venue Routes
+const venueRoutes = require("./routes/venue");
+app.use("/api/venues", venueRoutes);
 
-const venueRoutes = require('./routes/venue');
-app.use('/api/venues', venueRoutes);
 // Fetch venues
-app.get('/api/venues', async (req, res) => {
+app.get("/api/venues", async (req, res) => {
   try {
     const venues = await Venue.find();
     res.status(200).json(venues);
   } catch (error) {
-    console.error('Error fetching venues:', error);
-    res.status(500).json({ message: 'Error fetching venues', error: error.message });
+    console.error("Error fetching venues:", error);
+    res.status(500).json({ message: "Error fetching venues", error: error.message });
   }
 });
 
@@ -101,7 +97,7 @@ app.post("/api/venues", async (req, res) => {
     await newVenue.save();
     res.status(201).json(newVenue);
   } catch (error) {
-    console.error('Error creating venue:', error);
+    console.error("Error creating venue:", error);
     res.status(400).json({ error: error.message });
   }
 });
