@@ -47,14 +47,17 @@ const Organizer = mongoose.model("Organizer", {
 // Create Express app
 const app = express();
 
-// CORS Configuration
-const allowedOrigin = process.env.FRONTEND_URL || "https://www.utsavvibes.tech"; // Use dynamic URL from environment or default to the specified domain
+// Get Frontend URL from environment variable
+const frontendUrl = process.env.FRONTEND_URL || "https://www.utsavvibes.tech"; // Default to the specified URL if env variable is not set
+
+// CORS Setup
 app.use(cors({
-  origin: allowedOrigin, // Allow requests only from the frontend domain
-  methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allowed HTTP methods
+  origin: frontendUrl, // Allow requests only from the frontend domain
+  methods: ['GET', 'POST'], // Allowed HTTP methods
   credentials: true, // Enable cookies if needed
 }));
 
+// Middleware
 app.use(express.json());
 app.use("/images", express.static("public/images")); // Serve images
 
