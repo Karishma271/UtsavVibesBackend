@@ -2,21 +2,21 @@
   "name": "backend",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "nodemon server"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/udit19981/ShubhPrasang.git"
+    "url": "git+https://github.com/Karishma271/UtsavVibes.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/udit19981/ShubhPrasang/issues"
+    "url": "https://github.com/Karishma271/UtsavVibes/issues"
   },
-  "homepage": "https://github.com/udit19981/ShubhPrasang#readme",
+  "homepage": "https://github.com/Karishma271/UtsavVibes#readme",
   "dependencies": {
     "@fortawesome/fontawesome-free": "^6.4.2",
     "@fortawesome/react-fontawesome": "^0.2.0",
