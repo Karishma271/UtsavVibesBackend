@@ -6,6 +6,7 @@ const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken');
 
 
+
 // Signup API
 router.post('/signup', async (req, res) => {
   try {

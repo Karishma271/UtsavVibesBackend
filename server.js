@@ -47,14 +47,14 @@ const Organizer = mongoose.model("Organizer", {
 // Create Express app
 const app = express();
 
-// Middleware
-const corsOptions = {
-  origin: "https://utsavvibes.tech", // Allow frontend from Vercel domain
-  methods: "GET,POST,PUT,DELETE",
-  credentials: true, // Allow credentials
-};
+// CORS Configuration
+const allowedOrigin = process.env.FRONTEND_URL || "https://www.utsavvibes.tech"; // Use dynamic URL from environment or default to the specified domain
+app.use(cors({
+  origin: allowedOrigin, // Allow requests only from the frontend domain
+  methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allowed HTTP methods
+  credentials: true, // Enable cookies if needed
+}));
 
-app.use(cors(corsOptions));
 app.use(express.json());
 app.use("/images", express.static("public/images")); // Serve images
 
@@ -97,7 +97,6 @@ app.get("/api/venues", async (req, res) => {
 // POST a new venue
 app.post("/api/venues", async (req, res) => {
   try {
-    console.log(req.body); // Log the incoming data
     const newVenue = new Venue(req.body);
     await newVenue.save();
     res.status(201).json(newVenue);
