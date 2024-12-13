@@ -51,37 +51,23 @@ router.post('/signup', async (req, res) => {
 });
 
 router.post("/login", async (req, res) => {
+  const { email, password } = req.body;
+  
+  if (!email || !password) {
+    return res.status(400).json({ message: "Email and password are required" });
+  }
+  
   try {
-    const { email, password } = req.body;
-
-    if (!email || !password) {
-      return res.status(400).json({ message: "Email and password are required" });
-    }
-
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(400).json({ message: "Invalid email or password" });
+      return res.status(400).json({ message: "User not found" });
     }
 
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      return res.status(400).json({ message: "Invalid email or password" });
-    }
+    // Password comparison and logic
 
-    const token = jwt.sign(
-      { userId: user._id, role: user.role },
-      process.env.JWT_SECRET_KEY,
-      { expiresIn: '1h' }
-    );
-
-    res.status(200).json({
-      message: "Login successful",
-      token,
-      user: { username: user.username, email: user.email, role: user.role },
-    });
   } catch (error) {
-    console.error("Error during login:", error);
-    res.status(500).json({ message: "Internal server error" });
+    console.error("Error:", error);
+    return res.status(500).json({ message: "Internal server error" });
   }
 });
 module.exports = router;
