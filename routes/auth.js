@@ -66,25 +66,20 @@ router.post('/login', async (req, res) => {
       return res.status(400).json({ message: 'User not found.' });
     }
 
-    // Log for debugging
-    console.log("Stored hashed password:", user.password);
-    console.log("Input password:", password);
+    // Debugging step: Output the stored hashed password and input password
+    console.log('Stored hashed password:', user.password);
+    console.log('Input password:', password);
 
     // Compare hashed password with input password
     const isMatch = await bcrypt.compare(password, user.password);
-    console.log("Password Match Result:", isMatch);
-
     if (!isMatch) {
       return res.status(400).json({ message: 'Incorrect password.' });
     }
 
-    // Verify JWT Secret
-    console.log("JWT Secret:", process.env.JWT_SECRET);
-
     // Generate a JWT token
     const token = jwt.sign(
       { id: user._id, email: user.email, role: user.role },
-      process.env.JWT_SECRET || 'defaultSecret', // Fallback to avoid undefined errors
+      process.env.JWT_SECRET,
       { expiresIn: '1h' }
     );
 
