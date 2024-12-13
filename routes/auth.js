@@ -4,7 +4,7 @@ const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
-
+// Signup API
 router.post('/signup', async (req, res) => {
   const { username, email, password, role, phone } = req.body;
 
@@ -51,7 +51,6 @@ router.post('/signup', async (req, res) => {
 });
 
 // Login API
-// Login API
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
@@ -67,7 +66,7 @@ router.post('/login', async (req, res) => {
       return res.status(400).json({ message: 'User not found.' });
     }
 
-    // Compare hashed password with input password
+    // Compare hashed password with input password (trim any extra spaces)
     const isMatch = await bcrypt.compare(password.trim(), user.password); // trim() removes any leading/trailing spaces
     if (!isMatch) {
       return res.status(400).json({ message: 'Incorrect password.' });
