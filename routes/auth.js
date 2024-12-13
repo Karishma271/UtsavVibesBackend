@@ -1,23 +1,13 @@
-// routes/auth.js
 const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
-const bcrypt = require('bcryptjs')
+const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-
-
 
 // Signup API
 router.post('/signup', async (req, res) => {
   try {
-    const {
-      username,
-      email,
-      password,
-      role,
-      secretKey,
-      phone
-    } = req.body;
+    const { username, email, password, role, phone } = req.body;
 
     // Check if the user already exists
     const existingUser = await User.findOne({ username });
@@ -30,11 +20,14 @@ router.post('/signup', async (req, res) => {
       return res.status(400).json({ message: 'Email is already in use.' });
     }
 
+    // Hash the password before saving it to the database
+    const hashedPassword = await bcrypt.hash(password, 10);
+
     // Create a new user
     const user = new User({
       username,
       email,
-      password, 
+      password: hashedPassword, // Use the hashed password
       role,
       phone,
     });
@@ -47,7 +40,6 @@ router.post('/signup', async (req, res) => {
     res.status(500).json({ message: 'Server error.' });
   }
 });
-
 
 // Login API
 router.post('/login', async (req, res) => {
@@ -62,15 +54,14 @@ router.post('/login', async (req, res) => {
 
     // Check if the provided password matches the hashed password in the database
     const passwordMatch = await bcrypt.compare(password, user.password);
-
-    if (!passwordMatch) {        
-      return res.status(401).json({ message: 'Invalid password or password.' });
+    if (!passwordMatch) {
+      return res.status(401).json({ message: 'Invalid username or password.' });
     }
 
     // If the username and password are valid, create a JWT token
     const token = jwt.sign(
       { username: user.username, role: user.role },
-      'sskbasdjasdjbjb8dbuwdb3u39jMQQ]]3I', //secure secret key
+      process.env.JWT_SECRET, // Use the secret from environment variables
       { expiresIn: '1h' } // Token expiration time
     );
 
@@ -80,6 +71,5 @@ router.post('/login', async (req, res) => {
     res.status(500).json({ message: 'Server error.' });
   }
 });
-
 
 module.exports = router;
