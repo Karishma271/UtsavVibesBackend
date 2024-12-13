@@ -47,27 +47,17 @@ const Organizer = mongoose.model("Organizer", {
 // Create Express app
 const app = express();
 
-// Get Frontend URL from environment variable
-const frontendUrls = [
-  "https://www.utsavvibes.tech", // Production frontend URL
-  "https://utsav-vibes-frontend-902ncffwg-karishmas-projects-223d1cb1.vercel.app", // Dev frontend URL
-];
+
 
 
 // CORS Setup
-app.use(
-  cors({
-    origin: function (origin, callback) {
-      if (frontendUrls.indexOf(origin) !== -1 || !origin) {
-        callback(null, true); // Allow the request if the origin matches
-      } else {
-        callback(new Error("Not allowed by CORS")); // Reject request if origin does not match
-      }
-    },
-    methods: ["GET", "POST", "PUT", "DELETE"], // Allowed HTTP methods
-    credentials: true, // Enable cookies if needed
-  })
-);
+const corsOptions = {
+  origin: 'https://utsavvibes.tech', // replace with your frontend domain
+  methods: 'GET,POST,PUT,DELETE', // methods you want to allow
+  allowedHeaders: 'Content-Type,Authorization', // headers you want to allow
+  credentials: true, // if you are sending cookies or authorization headers
+};
+app.use(cors(corsOptions));
 
 // Middleware
 app.use(express.json());
