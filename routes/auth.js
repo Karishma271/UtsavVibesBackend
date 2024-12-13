@@ -50,12 +50,16 @@ router.post('/signup', async (req, res) => {
   }
 });
 
-// Login API
 router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // Find the user by email (not username anymore)
+    // Validate if email and password are provided
+    if (!email || !password) {
+      return res.status(400).json({ message: "Email and password are required." });
+    }
+
+    // Find the user by email
     const user = await User.findOne({ email });
     if (!user) {
       console.log("User not found");
@@ -73,13 +77,22 @@ router.post("/login", async (req, res) => {
       return res.status(400).json({ message: "Invalid email or password" });
     }
 
-    // Login successful
-    res.status(200).json({ message: "Login successful", user });
+    // Login successful, generate a token
+    const token = jwt.sign({ userId: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
+    // Send response with token and user info
+    res.status(200).json({
+      message: "Login successful",
+      token,
+      user: {
+        username: user.username,
+        role: user.role,
+        email: user.email,
+      },
+    });
   } catch (error) {
     console.error("Error during login:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 });
-
 module.exports = router;
