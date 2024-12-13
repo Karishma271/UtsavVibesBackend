@@ -51,6 +51,7 @@ router.post('/signup', async (req, res) => {
 });
 
 // Login API
+// Login API
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
@@ -66,12 +67,8 @@ router.post('/login', async (req, res) => {
       return res.status(400).json({ message: 'User not found.' });
     }
 
-    // Debugging step: Output the stored hashed password and input password
-    console.log('Stored hashed password:', user.password);
-    console.log('Input password:', password);
-
     // Compare hashed password with input password
-    const isMatch = await bcrypt.compare(password, user.password);
+    const isMatch = await bcrypt.compare(password.trim(), user.password); // trim() removes any leading/trailing spaces
     if (!isMatch) {
       return res.status(400).json({ message: 'Incorrect password.' });
     }
