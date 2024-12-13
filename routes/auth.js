@@ -53,27 +53,38 @@ router.post('/signup', async (req, res) => {
 router.post('/login', async (req, res) => {
   const { username, password } = req.body;
   
-  console.log("Received login request with username:", username); // Add this log to check the received data
+  console.log("Received login request with username/email:", username); // Log the input
 
   try {
     if (!username || !password) {
       return res.status(400).json({ message: 'Username and password are required.' });
     }
 
-    const user = await User.findOne({ username });
+    // Look for user by either username or email
+    const user = await User.findOne({
+      $or: [{ username }, { email: username }]  // Search for either username or email
+    });
+
     if (!user) {
       console.log('User not found'); // Log if the user is not found
       return res.status(401).json({ message: 'Invalid username or password.' });
     }
 
+    // Compare the password
     const passwordMatch = await bcrypt.compare(password, user.password);
     if (!passwordMatch) {
       console.log('Password mismatch'); // Log if the password doesn't match
       return res.status(401).json({ message: 'Invalid username or password.' });
     }
 
-    const token = jwt.sign({ username: user.username, role: user.role, id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    // Create a JWT token
+    const token = jwt.sign(
+      { username: user.username, role: user.role, id: user._id },
+      process.env.JWT_SECRET,
+      { expiresIn: '1h' }
+    );
     
+    // Send the successful response with the token
     res.status(200).json({
       message: 'Login successful.',
       token,
