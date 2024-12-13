@@ -26,8 +26,11 @@ router.post('/signup', async (req, res) => {
       return res.status(400).json({ message: 'Email is already in use.' });
     }
 
+    // Trim the password to avoid hidden spaces
+    const trimmedPassword = password.trim();
+
     // Hash the password before saving
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(trimmedPassword, 10);
     console.log("Hashed password at signup:", hashedPassword);  // Log the hashed password for debugging
 
     // Create new user instance
@@ -53,7 +56,6 @@ router.post('/signup', async (req, res) => {
 
 
 // Login API
-// Login API
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
@@ -69,8 +71,16 @@ router.post('/login', async (req, res) => {
       return res.status(400).json({ message: 'User not found.' });
     }
 
+    // Trim the password to avoid hidden spaces
+    const trimmedPassword = password.trim();
+
     // Compare hashed password with input password
-    const isMatch = await bcrypt.compare(password, user.password);  // This line is updated to use bcrypt.compare
+    const isMatch = await bcrypt.compare(trimmedPassword, user.password);  // This line uses bcrypt.compare
+
+    console.log('Input password:', trimmedPassword);  // Log input password
+    console.log('Stored hashed password:', user.password);  // Log stored hashed password
+    console.log('Password match result:', isMatch);  // Log result
+
     if (!isMatch) {
       return res.status(400).json({ message: 'Incorrect password.' });
     }
