@@ -66,9 +66,9 @@ router.post('/login', async (req, res) => {
       return res.status(400).json({ message: 'User not found.' });
     }
 
-    // Log user information and the stored password
+    // Log user information and stored password for debugging
     console.log('User found:', user.email);
-    console.log('Stored hashed password:', user.password);  // Log the stored hashed password
+    console.log('Stored hashed password:', user.password); // Log the stored hashed password
 
     // Compare hashed password with input password (trim any extra spaces)
     const isMatch = await bcrypt.compare(password.trim(), user.password); // trim() removes any leading/trailing spaces
