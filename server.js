@@ -53,6 +53,7 @@ const frontendUrls = [
   "https://utsav-vibes-frontend-902ncffwg-karishmas-projects-223d1cb1.vercel.app", // Dev frontend URL
 ];
 
+
 // CORS Setup
 app.use(
   cors({
