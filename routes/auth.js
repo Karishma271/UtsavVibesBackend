@@ -36,7 +36,7 @@ router.post('/signup', async (req, res) => {
     await user.save();
     res.status(200).json({ message: 'Signup successful.' });
   } catch (error) {
-    console.error(error);
+    console.error(error); // Log the error for debugging
     res.status(500).json({ message: 'Server error.' });
   }
 });
@@ -60,14 +60,15 @@ router.post('/login', async (req, res) => {
 
     // If the username and password are valid, create a JWT token
     const token = jwt.sign(
-      { username: user.username, role: user.role },
-      process.env.JWT_SECRET, // Use the secret from environment variables
-      { expiresIn: '1h' } // Token expiration time
+      { username: user.username, role: user.role, id: user._id }, // Include user ID in the token for later use
+      process.env.JWT_SECRET, // Ensure this is in your .env file
+      { expiresIn: '1h' } // Token expiration time (1 hour)
     );
 
-    res.status(200).json({ token, user });
+    // Send the token and user data in the response
+    res.status(200).json({ token, user: { username: user.username, role: user.role, id: user._id } });
   } catch (error) {
-    console.error(error);
+    console.error(error); // Log the error for debugging
     res.status(500).json({ message: 'Server error.' });
   }
 });
