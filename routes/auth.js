@@ -82,7 +82,7 @@ router.post('/login', async (req, res) => {
 
     console.log('Password match result:', isMatch); // Log result
 
-    if (!isMatch) {
+    if (isMatch) {
       return res.status(400).json({ message: 'Incorrect password.' });
     }
 
