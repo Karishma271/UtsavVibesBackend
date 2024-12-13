@@ -52,22 +52,38 @@ router.post('/signup', async (req, res) => {
 
 router.post("/login", async (req, res) => {
   const { email, password } = req.body;
-  
+  console.log("Login Request Received:", { email, password });
+
   if (!email || !password) {
+    console.log("Missing Fields");
     return res.status(400).json({ message: "Email and password are required" });
   }
-  
+
   try {
     const user = await User.findOne({ email });
     if (!user) {
+      console.log("User Not Found");
       return res.status(400).json({ message: "User not found" });
     }
 
-    // Password comparison and logic
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      console.log("Password Mismatch");
+      return res.status(400).json({ message: "Incorrect password" });
+    }
 
+    const token = jwt.sign(
+      { id: user._id, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: "1h" }
+    );
+
+    console.log("Login Successful");
+    return res.status(200).json({ token, user });
   } catch (error) {
-    console.error("Error:", error);
-    return res.status(500).json({ message: "Internal server error" });
+    console.error("Error during login:", error);
+    return res.status(500).json({ message: "Server Error", error: error.message });
   }
 });
+
 module.exports = router;
