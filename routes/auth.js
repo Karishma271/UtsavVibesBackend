@@ -52,49 +52,52 @@ router.post('/signup', async (req, res) => {
 
 router.post('/login', async (req, res) => {
   const { username, password } = req.body;
-  
-  console.log("Received login request with username/email:", username); // Log the input
+
+  // Ensure that both username and password are provided
+  if (!username || !password) {
+    return res.status(400).json({ message: 'Username and password are required.' });
+  }
 
   try {
-    if (!username || !password) {
-      return res.status(400).json({ message: 'Username and password are required.' });
-    }
-
-    // Look for user by either username or email
-    const user = await User.findOne({
-      $or: [{ username }, { email: username }]  // Search for either username or email
-    });
-
-    if (!user) {
-      console.log('User not found'); // Log if the user is not found
-      return res.status(401).json({ message: 'Invalid username or password.' });
-    }
-
-    // Compare the password
-    const passwordMatch = await bcrypt.compare(password, user.password);
-    if (!passwordMatch) {
-      console.log('Password mismatch'); // Log if the password doesn't match
-      return res.status(401).json({ message: 'Invalid username or password.' });
-    }
-
-    // Create a JWT token
-    const token = jwt.sign(
-      { username: user.username, role: user.role, id: user._id },
-      process.env.JWT_SECRET,
-      { expiresIn: '1h' }
-    );
+    // Find the user by username in the database
+    const user = await User.findOne({ username });
     
-    // Send the successful response with the token
+    // Check if user exists
+    if (!user) {
+      return res.status(401).json({ message: 'Invalid username or password.' });
+    }
+
+    // Log the hashed password and entered password for debugging (only in live environment if necessary)
+    console.log("Stored hashed password:", user.password); // This log should be temporary and removed after debugging
+    console.log("Entered password:", password); // This log should be temporary and removed after debugging
+
+    // Compare the entered password with the stored hashed password
+    const passwordMatch = await bcrypt.compare(password, user.password);
+
+    // If password doesn't match, return an error
+    if (!passwordMatch) {
+      return res.status(401).json({ message: 'Invalid username or password.' });
+    }
+
+    // If password matches, generate a JWT token
+    const token = jwt.sign({ username: user.username, role: user.role, id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    
+    // Return success response with token and user details
     res.status(200).json({
       message: 'Login successful.',
       token,
-      user: { username: user.username, role: user.role, email: user.email, phone: user.phone, id: user._id },
+      user: {
+        username: user.username,
+        role: user.role,
+        email: user.email,
+        phone: user.phone,
+        id: user._id
+      },
     });
 
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Server error during login.' });
+    res.status(500).json({ message: 'Server error during login.', error: error.message });
   }
 });
-
 module.exports = router;
