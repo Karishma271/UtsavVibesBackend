@@ -55,35 +55,35 @@ router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // Find the user by email
+    // Validate input
+    if (!email || !password) {
+      return res.status(400).json({ message: "Email and password are required" });
+    }
+
+    // Find user by email
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(400).json({ message: "Invalid email or password" });
     }
 
-    // Compare entered password with stored hashed password
+    // Compare passwords
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(400).json({ message: "Invalid email or password" });
     }
 
-    // If passwords match, generate and return JWT token
+    // Generate JWT token
     const token = jwt.sign(
-      { id: user._id, email: user.email, role: user.role }, 
-      process.env.JWT_SECRET, 
+      { userId: user._id, role: user.role },
+      process.env.JWT_SECRET_KEY, // Replace with your secret key
       { expiresIn: '1h' }
     );
 
-    // Send response with token and user data
+    // Return token and user data
     res.status(200).json({
       message: "Login successful",
       token,
-      user: {
-        id: user._id,
-        username: user.username,
-        email: user.email,
-        role: user.role
-      }
+      user: { username: user.username, email: user.email, role: user.role },
     });
   } catch (error) {
     console.error("Error during login:", error);
