@@ -7,18 +7,20 @@ const jwt = require('jsonwebtoken');
 // Signup API
 router.post('/signup', async (req, res) => {
   const { username, email, password, role, phone } = req.body;
-  try {
-    // Input validation
-    if (!username || !email || !password || !role || !phone) {
-      return res.status(400).json({ message: 'All fields are required.' });
-    }
 
-    // Check if the username or email already exists
+  // Input validation
+  if (!username || !email || !password || !role || !phone) {
+    return res.status(400).json({ message: 'All fields are required.' });
+  }
+
+  try {
+    // Check if the username already exists
     const existingUser = await User.findOne({ username });
     if (existingUser) {
       return res.status(400).json({ message: 'Username is already in use.' });
     }
 
+    // Check if the email already exists
     const existingEmail = await User.findOne({ email });
     if (existingEmail) {
       return res.status(400).json({ message: 'Email is already in use.' });
@@ -38,7 +40,10 @@ router.post('/signup', async (req, res) => {
 
     // Save the new user to the database
     await newUser.save();
+
+    // Respond with success message
     res.status(201).json({ message: 'Signup successful. Please log in.' });
+
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Server error during signup.', error: error.message });
@@ -48,19 +53,20 @@ router.post('/signup', async (req, res) => {
 // Login API
 router.post('/login', async (req, res) => {
   const { username, password } = req.body;
-  try {
-    // Input validation
-    if (!username || !password) {
-      return res.status(400).json({ message: 'Username and password are required.' });
-    }
 
-    // Check if the user exists
+  // Input validation
+  if (!username || !password) {
+    return res.status(400).json({ message: 'Username and password are required.' });
+  }
+
+  try {
+    // Find the user by username
     const user = await User.findOne({ username });
     if (!user) {
       return res.status(401).json({ message: 'Invalid username or password.' });
     }
 
-    // Check if the password matches
+    // Compare the provided password with the hashed password stored in the database
     const passwordMatch = await bcrypt.compare(password, user.password);
     if (!passwordMatch) {
       return res.status(401).json({ message: 'Invalid username or password.' });
@@ -85,6 +91,7 @@ router.post('/login', async (req, res) => {
         id: user._id,
       },
     });
+
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Server error during login.', error: error.message });
