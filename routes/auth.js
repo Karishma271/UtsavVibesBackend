@@ -50,6 +50,8 @@ router.post('/signup', async (req, res) => {
   }
 });
 
+// Login API
+// login route
 router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -95,4 +97,5 @@ router.post("/login", async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 });
+
 module.exports = router;
