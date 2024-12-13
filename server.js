@@ -47,19 +47,17 @@ const Organizer = mongoose.model("Organizer", {
 // Create Express app
 const app = express();
 
-
-
-
 // CORS Setup
 const corsOptions = {
   origin: function (origin, callback) {
-    // Define the allowed domains (both with and without www)
+    // Define allowed origins (both with and without www)
     const allowedOrigins = [
       'https://utsavvibes.tech',
       'https://www.utsavvibes.tech',
+      'http://localhost:3000', // Allow localhost for testing
     ];
 
-    // Allow localhost for testing purposes (remove or modify for production)
+    // If the origin is in the allowed list or is empty (for no origin requests), allow it
     if (allowedOrigins.includes(origin) || !origin) {
       callback(null, true);  // Allow the request
     } else {
@@ -71,6 +69,7 @@ const corsOptions = {
   credentials: true,  // Allow credentials (cookies, etc.)
 };
 
+// Enable CORS middleware
 app.use(cors(corsOptions));
 
 // Middleware
