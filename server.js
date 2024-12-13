@@ -52,10 +52,19 @@ const app = express();
 
 // CORS Setup
 const corsOptions = {
-  origin: 'https://utsavvibes.tech', // replace with your frontend domain
-  methods: 'GET,POST,PUT,DELETE', // methods you want to allow
-  allowedHeaders: 'Content-Type,Authorization', // headers you want to allow
-  credentials: true, // if you are sending cookies or authorization headers
+  origin: function (origin, callback) {
+    if (
+      ['https://utsavvibes.tech', 'https://www.utsavvibes.tech'].indexOf(origin) !== -1 ||
+      !origin // Allow requests from localhost or no origin (for testing)
+    ) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  methods: 'GET,POST,PUT,DELETE',
+  allowedHeaders: 'Content-Type,Authorization',
+  credentials: true,
 };
 app.use(cors(corsOptions));
 
