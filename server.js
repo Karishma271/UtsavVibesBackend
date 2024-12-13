@@ -47,19 +47,30 @@ const Organizer = mongoose.model("Organizer", {
 // Create Express app
 const app = express();
 
-
-const allowedOrigins = ['https://utsavvibes.tech', 'http://localhost:3000'];
-
-app.use(cors({
+// CORS Setup
+const corsOptions = {
   origin: function (origin, callback) {
-    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
-      callback(null, true);
+    // Define allowed origins (both with and without www)
+    const allowedOrigins = [
+      'https://utsavvibes.tech',
+      'https://www.utsavvibes.tech',
+      'http://localhost:3000', // Allow localhost for testing
+    ];
+
+    // If the origin is in the allowed list or is empty (for no origin requests), allow it
+    if (allowedOrigins.includes(origin) || !origin) {
+      callback(null, true);  // Allow the request
     } else {
-      callback(new Error('Not allowed by CORS'));
+      callback(new Error('Not allowed by CORS'));  // Reject the request
     }
   },
-  credentials: true,
-}));
+  methods: 'GET,POST,PUT,DELETE',  // Allow these HTTP methods
+  allowedHeaders: 'Content-Type,Authorization',  // Allow these headers
+  credentials: true,  
+};
+
+// Enable CORS middleware
+app.use(cors(corsOptions));
 
 // Middleware
 app.use(express.json());
