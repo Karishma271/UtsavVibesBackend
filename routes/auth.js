@@ -53,6 +53,7 @@ router.post('/signup', async (req, res) => {
 
 
 // Login API
+// Login API
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
@@ -62,27 +63,19 @@ router.post('/login', async (req, res) => {
   }
 
   try {
-    // Check if the user exists by email
+    // Check if the user exists
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(400).json({ message: 'User not found.' });
     }
 
-    // Log both the stored and input password to debug
-    console.log("Input password:", password);  // input password
-    console.log("Stored hashed password:", user.password);  // stored hashed password
-
-    // Trim any unwanted spaces and compare the hashed password with the input password
-    const isMatch = await bcrypt.compare(password.trim(), user.password.trim());  // trimming passwords before comparison
-
-    // Log the result of the comparison
-    console.log("Password match result:", isMatch);
-
+    // Compare hashed password with input password
+    const isMatch = await bcrypt.compare(password, user.password);  // This line is updated to use bcrypt.compare
     if (!isMatch) {
       return res.status(400).json({ message: 'Incorrect password.' });
     }
 
-    // Generate a JWT token if passwords match
+    // Generate a JWT token
     const token = jwt.sign(
       { id: user._id, email: user.email, role: user.role },
       process.env.JWT_SECRET,
