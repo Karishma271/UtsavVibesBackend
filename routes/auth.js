@@ -50,54 +50,33 @@ router.post('/signup', async (req, res) => {
   }
 });
 
-router.post('/login', async (req, res) => {
-  const { username, password } = req.body;
-
-  // Ensure that both username and password are provided
-  if (!username || !password) {
-    return res.status(400).json({ message: 'Username and password are required.' });
-  }
-
+router.post("/login", async (req, res) => {
   try {
-    // Find the user by username in the database
-    const user = await User.findOne({ username });
-    
-    // Check if user exists
+    const { email, password } = req.body;
+
+    // Find the user by email
+    const user = await User.findOne({ email });
     if (!user) {
-      return res.status(401).json({ message: 'Invalid username or password.' });
+      console.log("User not found");
+      return res.status(400).json({ message: "Invalid email or password" });
     }
 
-    // Log the hashed password and entered password for debugging (only in live environment if necessary)
-    console.log("Stored hashed password:", user.password); // This log should be temporary and removed after debugging
-    console.log("Entered password:", password); // This log should be temporary and removed after debugging
+    console.log("Stored Hashed Password:", user.password); // Log stored password
 
-    // Compare the entered password with the stored hashed password
-    const passwordMatch = await bcrypt.compare(password, user.password);
+    // Compare entered password with stored hashed password
+    const isMatch = await bcrypt.compare(password, user.password);
+    console.log("Password Match Result:", isMatch); // Log the result
 
-    // If password doesn't match, return an error
-    if (!passwordMatch) {
-      return res.status(401).json({ message: 'Invalid username or password.' });
+    if (!isMatch) {
+      console.log("Password comparison failed");
+      return res.status(400).json({ message: "Invalid email or password" });
     }
 
-    // If password matches, generate a JWT token
-    const token = jwt.sign({ username: user.username, role: user.role, id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-    
-    // Return success response with token and user details
-    res.status(200).json({
-      message: 'Login successful.',
-      token,
-      user: {
-        username: user.username,
-        role: user.role,
-        email: user.email,
-        phone: user.phone,
-        id: user._id
-      },
-    });
-
+    // Login successful
+    res.status(200).json({ message: "Login successful", user });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Server error during login.', error: error.message });
+    console.error("Error during login:", error);
+    res.status(500).json({ message: "Internal server error" });
   }
 });
 module.exports = router;
