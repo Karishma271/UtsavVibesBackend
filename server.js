@@ -48,17 +48,17 @@ const Organizer = mongoose.model("Organizer", {
 const app = express();
 
 
-// CORS Setup
-const allowedOrigins = ['https://utsavvibes.tech', 'http://localhost:3000']; // Add all your allowed frontend domains here
+const allowedOrigins = ['https://utsavvibes.tech', 'http://localhost:3000'];
+
 app.use(cors({
   origin: function (origin, callback) {
-    if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
-      callback(null, true); // Allow requests from allowed origins
+    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
     } else {
       callback(new Error('Not allowed by CORS'));
     }
   },
-  credentials: true, // Allow cookies to be sent with requests
+  credentials: true,
 }));
 
 // Middleware
