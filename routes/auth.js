@@ -28,6 +28,7 @@ router.post('/signup', async (req, res) => {
 
     // Hash the password before saving
     const hashedPassword = await bcrypt.hash(password, 10);
+    console.log("Hashed password at signup:", hashedPassword);  // Log the hashed password for debugging
 
     // Create new user instance
     const newUser = new User({
@@ -50,6 +51,7 @@ router.post('/signup', async (req, res) => {
   }
 });
 
+
 // Login API
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
@@ -60,25 +62,27 @@ router.post('/login', async (req, res) => {
   }
 
   try {
-    // Check if the user exists
+    // Check if the user exists by email
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(400).json({ message: 'User not found.' });
     }
 
-    // Log user information and stored password for debugging
-    console.log('User found:', user.email);
-    console.log('Stored hashed password:', user.password); // Log the stored hashed password
+    // Log both the stored and input password to debug
+    console.log("Input password:", password);  // input password
+    console.log("Stored hashed password:", user.password);  // stored hashed password
 
-    // Compare hashed password with input password (trim any extra spaces)
-    const isMatch = await bcrypt.compare(password.trim(), user.password); // trim() removes any leading/trailing spaces
-    console.log('Password match result:', isMatch);  // Log if the password comparison is successful
+    // Trim any unwanted spaces and compare the hashed password with the input password
+    const isMatch = await bcrypt.compare(password.trim(), user.password.trim());  // trimming passwords before comparison
+
+    // Log the result of the comparison
+    console.log("Password match result:", isMatch);
 
     if (!isMatch) {
       return res.status(400).json({ message: 'Incorrect password.' });
     }
 
-    // Generate a JWT token
+    // Generate a JWT token if passwords match
     const token = jwt.sign(
       { id: user._id, email: user.email, role: user.role },
       process.env.JWT_SECRET,
@@ -100,5 +104,7 @@ router.post('/login', async (req, res) => {
     res.status(500).json({ message: 'Internal server error.', error: error.message });
   }
 });
+
+
 
 module.exports = router;
