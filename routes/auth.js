@@ -26,11 +26,8 @@ router.post('/signup', async (req, res) => {
       return res.status(400).json({ message: 'Email is already in use.' });
     }
 
-    // Trim the password to avoid hidden spaces
-    const trimmedPassword = password.trim();
-
     // Hash the password before saving
-    const hashedPassword = await bcrypt.hash(trimmedPassword, 10);
+    const hashedPassword = await bcrypt.hash(password, 10);
     console.log("Hashed password at signup:", hashedPassword);  // Log the hashed password for debugging
 
     // Create new user instance
@@ -54,7 +51,7 @@ router.post('/signup', async (req, res) => {
   }
 });
 
-
+// Login API
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
@@ -70,30 +67,23 @@ router.post('/login', async (req, res) => {
       return res.status(400).json({ message: 'User not found.' });
     }
 
-    // Trim password to remove leading/trailing spaces
-    const trimmedPassword = password.trim();
+    // Compare hashed password with input password
+    const isMatch = await bcrypt.compare(password.trim(), user.password);  // Trim password for comparison
+    console.log('Input password:', password.trim());  // Log the input password
+    console.log('Stored hashed password:', user.password);  // Log the stored hash
 
-    // Log the input password and the hashed password from the database
-    console.log('Input password:', trimmedPassword);
-    console.log('Stored hashed password:', user.password);
-
-    // Compare the hashed password with the stored hash
-    const isMatch = await bcrypt.compare(trimmedPassword, user.password);
-
-    console.log('Password match result:', isMatch); // Log result
-
-    if (isMatch) {
+    if (!isMatch) {
       return res.status(400).json({ message: 'Incorrect password.' });
     }
 
-    // Generate JWT token
+    // Generate a JWT token
     const token = jwt.sign(
       { id: user._id, email: user.email, role: user.role },
       process.env.JWT_SECRET,
       { expiresIn: '1h' }
     );
 
-    // Return success response with token
+    // Return success response with token and user details
     res.status(200).json({
       message: 'Login successful.',
       token,
@@ -108,6 +98,5 @@ router.post('/login', async (req, res) => {
     res.status(500).json({ message: 'Internal server error.', error: error.message });
   }
 });
-
 
 module.exports = router;
