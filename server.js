@@ -47,8 +47,8 @@ const Organizer = mongoose.model("Organizer", {
 // Create Express app
 const app = express();
 
+
 // CORS Setup
-// CORS setup to allow your frontend domain
 const allowedOrigins = ['https://utsavvibes.tech', 'http://localhost:3000']; // Add all your allowed frontend domains here
 app.use(cors({
   origin: function (origin, callback) {
