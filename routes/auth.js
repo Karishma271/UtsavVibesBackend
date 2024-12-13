@@ -68,10 +68,7 @@ router.post('/login', async (req, res) => {
     }
 
     // Compare hashed password with input password
-    const isMatch = await bcrypt.compare(password.trim(), user.password);  // Trim password for comparison
-    console.log('Input password:', password.trim());  // Log the input password
-    console.log('Stored hashed password:', user.password);  // Log the stored hash
-
+    const isMatch = await bcrypt.compare(password.trim(), user.password);
     if (!isMatch) {
       return res.status(400).json({ message: 'Incorrect password.' });
     }
@@ -83,7 +80,7 @@ router.post('/login', async (req, res) => {
       { expiresIn: '1h' }
     );
 
-    // Return success response with token and user details
+    // Return success response
     res.status(200).json({
       message: 'Login successful.',
       token,
