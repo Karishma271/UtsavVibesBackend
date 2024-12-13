@@ -60,8 +60,6 @@ app.use(cors({
   },
   credentials: true, // Allow cookies to be sent with requests
 }));
-// Enable CORS middleware
-app.use(cors(corsOptions));
 
 // Middleware
 app.use(express.json());
