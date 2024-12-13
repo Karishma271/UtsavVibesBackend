@@ -71,28 +71,30 @@ router.post('/login', async (req, res) => {
       return res.status(400).json({ message: 'User not found.' });
     }
 
-    // Trim the password to avoid hidden spaces
+    // Trim password to remove leading/trailing spaces
     const trimmedPassword = password.trim();
 
-    // Compare hashed password with input password
-    const isMatch = await bcrypt.compare(trimmedPassword, user.password);  // This line uses bcrypt.compare
+    // Log the input password and the hashed password from the database
+    console.log('Input password:', trimmedPassword);
+    console.log('Stored hashed password:', user.password);
 
-    console.log('Input password:', trimmedPassword);  // Log input password
-    console.log('Stored hashed password:', user.password);  // Log stored hashed password
-    console.log('Password match result:', isMatch);  // Log result
+    // Compare the hashed password with the stored hash
+    const isMatch = await bcrypt.compare(trimmedPassword, user.password);
+
+    console.log('Password match result:', isMatch); // Log result
 
     if (!isMatch) {
       return res.status(400).json({ message: 'Incorrect password.' });
     }
 
-    // Generate a JWT token
+    // Generate JWT token
     const token = jwt.sign(
       { id: user._id, email: user.email, role: user.role },
       process.env.JWT_SECRET,
       { expiresIn: '1h' }
     );
 
-    // Return success response
+    // Return success response with token
     res.status(200).json({
       message: 'Login successful.',
       token,
@@ -107,7 +109,6 @@ router.post('/login', async (req, res) => {
     res.status(500).json({ message: 'Internal server error.', error: error.message });
   }
 });
-
 
 
 module.exports = router;
