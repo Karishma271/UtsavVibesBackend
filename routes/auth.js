@@ -51,51 +51,43 @@ router.post('/signup', async (req, res) => {
 });
 
 // Login API
-// login route
 router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // Validate if email and password are provided
-    if (!email || !password) {
-      return res.status(400).json({ message: "Email and password are required." });
-    }
-
     // Find the user by email
     const user = await User.findOne({ email });
     if (!user) {
-      console.log("User not found");
       return res.status(400).json({ message: "Invalid email or password" });
     }
-
-    console.log("Stored Hashed Password:", user.password); // Log stored password
 
     // Compare entered password with stored hashed password
     const isMatch = await bcrypt.compare(password, user.password);
-    console.log("Password Match Result:", isMatch); // Log the result
-
     if (!isMatch) {
-      console.log("Password comparison failed");
       return res.status(400).json({ message: "Invalid email or password" });
     }
 
-    // Login successful, generate a token
-    const token = jwt.sign({ userId: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    // If passwords match, generate and return JWT token
+    const token = jwt.sign(
+      { id: user._id, email: user.email, role: user.role }, 
+      process.env.JWT_SECRET, 
+      { expiresIn: '1h' }
+    );
 
-    // Send response with token and user info
+    // Send response with token and user data
     res.status(200).json({
       message: "Login successful",
       token,
       user: {
+        id: user._id,
         username: user.username,
-        role: user.role,
         email: user.email,
-      },
+        role: user.role
+      }
     });
   } catch (error) {
     console.error("Error during login:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 });
-
 module.exports = router;
