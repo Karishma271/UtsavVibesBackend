@@ -53,10 +53,9 @@ const app = express();
 // CORS Setup
 const corsOptions = {
   origin: function (origin, callback) {
-    if (
-      ['https://utsavvibes.tech', 'https://www.utsavvibes.tech'].indexOf(origin) !== -1 ||
-      !origin // Allow requests from localhost or no origin (for testing)
-    ) {
+    // Explicitly match the frontend URLs
+    const allowedOrigins = ['https://utsavvibes.tech', 'https://www.utsavvibes.tech'];
+    if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
       callback(null, true);
     } else {
       callback(new Error('Not allowed by CORS'));
@@ -64,8 +63,9 @@ const corsOptions = {
   },
   methods: 'GET,POST,PUT,DELETE',
   allowedHeaders: 'Content-Type,Authorization',
-  credentials: true,
+  credentials: true, // Ensure credentials are allowed (cookies, authorization headers)
 };
+
 app.use(cors(corsOptions));
 
 // Middleware
