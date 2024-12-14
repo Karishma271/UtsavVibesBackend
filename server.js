@@ -1,29 +1,18 @@
 // Required Modules
 const express = require("express");
 const mongoose = require("mongoose");
-const cors = require ("cors");
+const cors = require("cors");
 const path = require("path");
-const fs = require("fs");
 const multer = require("multer");
 require("dotenv").config(); 
-const router = express.Router();
 
+// Create Express app
+const app = express();
 
-
-// Import the upload route
+// Import Routes
 const uploadRouter = require('./routes/upload'); // Adjust the path if needed
-
-// Use the uploadRouter for the /api routes
-app.use('/api', uploadRouter);
-
-// Static folder for serving uploaded files
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-
-// Load environment variables
-
-// Models
-const User = require("./models/User");
-const Venue = require("./models/Venue");
+const authRoutes = require("./routes/auth");
+const venueRoutes = require("./routes/venue");
 
 // Event Models
 const weddingEvents = mongoose.model("weddingEvents", {
@@ -34,6 +23,7 @@ const weddingEvents = mongoose.model("weddingEvents", {
   email: String,
   phoneNumber: String,
 });
+
 const birthdayEvents = mongoose.model("birthdayEvents", {
   personName: String,
   eventDate: Date,
@@ -41,6 +31,7 @@ const birthdayEvents = mongoose.model("birthdayEvents", {
   email: String,
   phoneNumber: String,
 });
+
 const corporateEvents = mongoose.model("corporateEvents", {
   companyName: String,
   eventDate: Date,
@@ -48,6 +39,7 @@ const corporateEvents = mongoose.model("corporateEvents", {
   email: String,
   phoneNumber: String,
 });
+
 const Organizer = mongoose.model("Organizer", {
   name: String,
   description: String,
@@ -58,9 +50,6 @@ const Organizer = mongoose.model("Organizer", {
   website: String,
 });
 
-// Create Express app
-const app = express();
-
 // CORS Setup
 const corsOptions = {
   origin: 'https://www.utsavvibes.tech', // Allow requests from this domain
@@ -68,15 +57,11 @@ const corsOptions = {
   allowedHeaders: ['Content-Type', 'Authorization'], // Allow these headers
   credentials: true, // Allow credentials such as cookies
 };
-
-
-// Use CORS middleware with the options
 app.use(cors(corsOptions));
 
-// Enable CORS middleware
-app.use(cors(corsOptions));
-
-
+// Middleware
+app.use(express.json()); // Middleware to parse JSON requests
+app.use(express.urlencoded({ extended: true })); // Middleware to parse URL-encoded requests
 
 // MongoDB Connection
 mongoose
@@ -87,20 +72,20 @@ mongoose
   .then(() => console.log("MongoDB connected"))
   .catch((err) => console.error("MongoDB connection error:", err));
 
+// Serve static files (like uploaded images)
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+// Import and use routes
+app.use("/api", authRoutes);  // Authentication routes
+app.use("/api", uploadRouter); // Image upload routes
+app.use("/api/venues", venueRoutes); // Venue routes
+
 // Welcome message route
 app.get("/", (req, res) => {
   res.send("Hello, welcome to the UtsavVibes backend!");
 });
 
-// Import and use routes
-const authRoutes = require("./routes/auth");
-app.use("/api", authRoutes);
-
 // Venue Routes
-const venueRoutes = require("./routes/venue");
-app.use("/api/venues", venueRoutes);
-
-// Fetch venues
 app.get("/api/venues", async (req, res) => {
   try {
     const venues = await Venue.find();
@@ -111,7 +96,6 @@ app.get("/api/venues", async (req, res) => {
   }
 });
 
-// POST a new venue
 app.post("/api/venues", async (req, res) => {
   try {
     const newVenue = new Venue(req.body);
@@ -123,7 +107,6 @@ app.post("/api/venues", async (req, res) => {
   }
 });
 
-// PUT update venue
 app.put("/api/venues/:id", async (req, res) => {
   try {
     const updatedVenue = await Venue.findByIdAndUpdate(req.params.id, req.body, { new: true });
@@ -134,7 +117,6 @@ app.put("/api/venues/:id", async (req, res) => {
   }
 });
 
-// DELETE venue
 app.delete("/api/venues/:id", async (req, res) => {
   try {
     await Venue.findByIdAndRemove(req.params.id);
@@ -144,21 +126,6 @@ app.delete("/api/venues/:id", async (req, res) => {
     res.status(500).json({ message: "Error removing venue", error: error.message });
   }
 });
-
-
-
-
-app.get("/api/users", async (req, res) => {
-  try {
-    const users = await User.find(); // Fetch all users from the database
-    res.status(200).json(users); // Return the users as JSON
-  } catch (error) {
-    console.error("Error fetching users:", error);
-    res.status(500).json({ message: "Error fetching users", error: error.message });
-  }
-});
-
-
 
 // Event Registration Routes
 app.post("/wedding", async (req, res) => {
@@ -257,7 +224,6 @@ app.get("/api/venue/count", async (req, res) => {
   }
 });
 
-// Backend route for organizer count
 app.get("/api/organizer/count", async (req, res) => {
   try {
     const count = await Organizer.countDocuments();
