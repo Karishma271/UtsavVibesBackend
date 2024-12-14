@@ -20,7 +20,7 @@ router.post('/upload-image', upload.single('image'), (req, res) => {
     return res.status(400).json({ message: 'No file uploaded' });
   }
 
-  const imageUrl = `/uploads/${req.file.filename}`;
+  const imageUrl = `/uploads/${req.file.filename}.jpg`;
   res.status(200).json({ imageUrl }); // Send back the URL of the uploaded image
 });
 
