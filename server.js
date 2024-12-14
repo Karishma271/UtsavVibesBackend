@@ -143,12 +143,8 @@ app.post("/api/upload-image", upload.single("image"), (req, res) => {
       return res.status(400).json({ error: "No file uploaded" });
     }
 
-    const uniqueFilename = `${Date.now()}-${req.file.originalname}`;
-    const targetPath = path.join(__dirname, "public", "images", uniqueFilename);
-
-    fs.renameSync(req.file.path, targetPath);
-
-    res.status(200).json({ imageUrl: `/images/${uniqueFilename}` });
+    const imageUrl = `/images/${req.file.filename}`; // Construct the URL
+    res.status(200).json({ imageUrl }); // Return the image URL to the frontend
   } catch (error) {
     console.error("Error uploading image:", error);
     res.status(500).json({ error: error.message || "Internal Server Error" });
@@ -164,6 +160,7 @@ app.get("/api/users", async (req, res) => {
     res.status(500).json({ message: "Error fetching users", error: error.message });
   }
 });
+
 
 
 // Event Registration Routes
