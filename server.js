@@ -10,7 +10,7 @@ require("dotenv").config(); // Load environment variables
 // Models
 const User = require("./models/User");
 const Venue = require("./models/Venue");
-
+const hallsRoute = require('./routes/halls');
 // Event Models
 const weddingEvents = mongoose.model("weddingEvents", {
   brideName: String,
@@ -103,7 +103,7 @@ app.get("/api/venues", async (req, res) => {
     res.status(500).json({ message: "Error fetching venues", error: error.message });
   }
 });
-const hallsRoute = require('./routes/halls');
+
 app.use('/api/halls', hallsRoute);
 // POST a new venue
 app.post("/api/venues", async (req, res) => {
