@@ -6,11 +6,10 @@ const VenueSchema = new mongoose.Schema({
   description: String,
   address: { type: String, required: true },
   capacity: Number,
-  acceptedPayments: { type: [String], default: [] }, // Update this
-  imageUrl: String,
+  acceptedPayments: { type: [String], default: [] },
+  imageUrl: { type: String }, // Store the image URL or image data in binary format
 });
 
 const Venue = mongoose.model('Venue', VenueSchema);
 
 module.exports = Venue;
-
