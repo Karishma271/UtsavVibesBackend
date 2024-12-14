@@ -64,7 +64,7 @@ app.use(cors(corsOptions));
 
 // Middleware
 app.use(express.json());
-app.use("/images", express.static("public/images")); // Serve images
+app.use("/uploads", express.static("uploads")); // Serve images
 
 // File upload setup
 const upload = multer({ dest: "public/" });
@@ -143,7 +143,7 @@ app.post("/api/upload-image", upload.single("image"), (req, res) => {
       return res.status(400).json({ error: "No file uploaded" });
     }
 
-    const imageUrl = `/images/${req.file.filename}`; // Construct the URL
+    const imageUrl = `/uploads/${req.file.filename}`; // Construct the URL
     res.status(200).json({ imageUrl }); // Return the image URL to the frontend
   } catch (error) {
     console.error("Error uploading image:", error);
