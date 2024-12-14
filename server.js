@@ -103,7 +103,8 @@ app.get("/api/venues", async (req, res) => {
     res.status(500).json({ message: "Error fetching venues", error: error.message });
   }
 });
-
+const hallsRoute = require('./routes/halls');
+app.use('/api/halls', hallsRoute);
 // POST a new venue
 app.post("/api/venues", async (req, res) => {
   try {
