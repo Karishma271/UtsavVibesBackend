@@ -1,30 +1,27 @@
-// upload.js (Place this file in your project folder, e.g., `routes` or `middleware` folder)
 const express = require('express');
 const multer = require('multer');
 const path = require('path');
 const router = express.Router();
 
-// Set up multer storage configuration
+// Define storage location for uploaded images
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, 'uploads/'); // Destination folder for uploaded files
+    cb(null, './uploads'); // Save images to uploads folder
   },
   filename: (req, file, cb) => {
-    cb(null, Date.now() + path.extname(file.originalname)); // Unique filename
-  }
+    cb(null, Date.now() + path.extname(file.originalname)); // Ensure unique file names
+  },
 });
 
-const upload = multer({ storage: storage });
+// Set up multer upload
+const upload = multer({ storage });
 
-// Route to handle image upload
+// Route to handle image uploads
 router.post('/upload-image', upload.single('image'), (req, res) => {
   if (!req.file) {
-    return res.status(400).send('No image uploaded.');
+    return res.status(400).send('No file uploaded.');
   }
-
-  // Return the image URL after it's uploaded
-  const imageUrl = `/uploads/${req.file.filename}`;
-  res.json({ imageUrl });
+  res.json({ imageUrl: `/uploads/${req.file.filename}` });
 });
 
 module.exports = router;

@@ -11,7 +11,7 @@ const router = express.Router();
 
 
 // Import the upload route
-const uploadRouter = require('./upload'); // Adjust the path if needed
+const uploadRouter = require('./routes/upload'); // Adjust the path if needed
 
 // Use the uploadRouter for the /api routes
 app.use('/api', uploadRouter);
