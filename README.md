@@ -51,3 +51,7 @@ git remote add origin https://github.com/<username>/<repository>.git
 
 # 6. Push the changes to GitHub (replace 'master' with your branch name if different)
 git push -u origin master
+
+# 7. Live Project Link:
+# Once deployed, you can access the live project via the following URL:
+# https://utsavvibes.tech
