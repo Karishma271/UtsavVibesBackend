@@ -28,7 +28,7 @@
     "mongoose": "^7.8.3",
     "multer": "^1.4.5-lts.1",
     "nodemon": "^3.0.1",
-    "paypal-checkout": "^4.0.338",
-    "express-validator": "^6.16.0"
+    "paypal-checkout": "^4.0.338"
+   
   }
 }

@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Venue = require('../models/Venue');
-const { body, validationResult } = require('express-validator');
+
 
 /**
  * Route to get all venues
