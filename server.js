@@ -64,10 +64,12 @@ app.use(cors(corsOptions));
 
 // Middleware
 app.use(express.json());
-app.use("/uploads", express.static("uploads")); // Serve images
+// Serve static files (images, etc.)
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+// Serve images
 
 // File upload setup
-const upload = multer({ dest: "public/" });
+const upload = multer({ dest: "uploads" });
 
 // MongoDB Connection
 mongoose
