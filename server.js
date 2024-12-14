@@ -5,7 +5,21 @@ const cors = require ("cors");
 const path = require("path");
 const fs = require("fs");
 const multer = require("multer");
-require("dotenv").config(); // Load environment variables
+require("dotenv").config(); 
+const router = express.Router();
+
+
+
+// Import the upload route
+const uploadRouter = require('./upload'); // Adjust the path if needed
+
+// Use the uploadRouter for the /api routes
+app.use('/api', uploadRouter);
+
+// Static folder for serving uploaded files
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+// Load environment variables
 
 // Models
 const User = require("./models/User");
@@ -62,12 +76,7 @@ app.use(cors(corsOptions));
 // Enable CORS middleware
 app.use(cors(corsOptions));
 
-// Middleware
-app.use(express.json());
-app.use("/images", express.static("public/images")); // Serve images
 
-// File upload setup
-const upload = multer({ dest: "public/" });
 
 // MongoDB Connection
 mongoose
@@ -136,20 +145,8 @@ app.delete("/api/venues/:id", async (req, res) => {
   }
 });
 
-// File upload route for images
-app.post("/api/upload-image", upload.single("image"), (req, res) => {
-  try {
-    if (!req.file) {
-      return res.status(400).json({ error: "No file uploaded" });
-    }
 
-    const imageUrl = `/images/${req.file.filename}`; // Construct the URL
-    res.status(200).json({ imageUrl }); // Return the image URL to the frontend
-  } catch (error) {
-    console.error("Error uploading image:", error);
-    res.status(500).json({ error: error.message || "Internal Server Error" });
-  }
-});
+
 
 app.get("/api/users", async (req, res) => {
   try {
