@@ -1,27 +1,29 @@
-const express = require('express');
-const multer = require('multer');
-const path = require('path');
+const express = require("express");
+const multer = require("multer");
+const path = require("path");
+
 const router = express.Router();
 
-// Define storage location for uploaded images
+// Set up storage configuration for Multer
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, './uploads'); // Save images to uploads folder
+    cb(null, path.join(__dirname, "../uploads")); // Store in the uploads folder
   },
   filename: (req, file, cb) => {
-    cb(null, Date.now() + path.extname(file.originalname)); // Ensure unique file names
+    cb(null, Date.now() + path.extname(file.originalname)); // Use unique filenames
   },
 });
 
-// Set up multer upload
-const upload = multer({ storage });
+const upload = multer({ storage: storage });
 
-// Route to handle image uploads
-router.post('/upload-image', upload.single('image'), (req, res) => {
+// Upload route to handle single image upload
+router.post("/upload", upload.single("image"), (req, res) => {
   if (!req.file) {
-    return res.status(400).send('No file uploaded.');
+    return res.status(400).json({ message: "No file uploaded" });
   }
-  res.json({ imageUrl: `/uploads/${req.file.filename}` });
+
+  const imageUrl = req.file.filename; // Get the filename of the uploaded image
+  res.status(200).json({ message: "File uploaded successfully", imageUrl });
 });
 
 module.exports = router;

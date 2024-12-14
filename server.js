@@ -10,7 +10,7 @@ require("dotenv").config();
 const app = express();
 
 // Import Routes
-const uploadRouter = require('./routes/upload'); // Adjust the path if needed
+const uploadRouter = require('./routes/upload'); 
 const authRoutes = require("./routes/auth");
 const venueRoutes = require("./routes/venue");
 
@@ -84,6 +84,9 @@ app.use("/api/venues", venueRoutes); // Venue routes
 app.get("/", (req, res) => {
   res.send("Hello, welcome to the UtsavVibes backend!");
 });
+// Serve static files (images) from the uploads folder
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 
 // Venue Routes
 app.get("/api/venues", async (req, res) => {
